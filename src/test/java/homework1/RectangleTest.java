@@ -170,22 +170,6 @@ class RectangleTest {
     assertEquals(0, rec1.intersection(rec2).area());
   }
 
-  // @Test
-  // @DisplayName("Test with {-5, -5, 5, 5} and {-4, -10, -7, 3}")
-  // void test_m5_m5_m5_m5_and_m4_m10_m7_3() {
-  //   Rectangle rec1 = new Rectangle(-5, -5, 5, 5);
-  //   Rectangle rec2 = new Rectangle(-4, -10, -7, 3);
-  //   assertEquals(0, rec1.intersection(rec2).area());
-  // }
-
-  // @Test
-  // @DisplayName("Test with {-5, -5, 5, 5} and {5, 0, -5, 0}")
-  // void test_m5_m5_m5_m5_and_5_0_m5_0() {
-  //   Rectangle rec1 = new Rectangle(-5, -5, 5, 5);
-  //   Rectangle rec2 = new Rectangle(5, 0, -5, 0);
-  //   assertEquals(0, rec1.intersection(rec2).area());
-  // }
-
   @Test
   @DisplayName("Test with {-5, -5, 5, 5} and {-4, 3, 5, -8}")
   void test__m5_m5_m5_m5_and_m4_3_5_m8() {
