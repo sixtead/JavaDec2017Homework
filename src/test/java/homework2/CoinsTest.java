@@ -25,6 +25,43 @@ class CoinsTest {
     }
 
     @Test
+    @DisplayName("test addAll() method")
+    void testAddAll() {
+        Coins coinsStack = new Coins();
+        Coin coinOne = new Coin(1);
+        Coin coinTwo = new Coin(2);
+        Coin coinThree = new Coin(3);
+
+        coinsStack.addAll(new Coin[] {coinOne, coinTwo, coinThree});
+
+        assertAll(
+            () -> assertEquals(coinOne, coinsStack.get(0)),
+            () -> assertEquals(coinTwo, coinsStack.get(1)),
+            () -> assertEquals(coinThree, coinsStack.get(2))
+        );
+    }
+
+    @Test
+    @DisplayName("test getWeight() method when all coins is genuine")
+    void testGetWeightGenuine() {
+        assertEquals(12, coins.getWeight());
+    }
+
+    @Test
+    @DisplayName("test getWeight() method when one coin is lighter than others")
+    void testGetWeightLighter() {
+        coins.set(0, new Coin(0.5));
+        assertEquals(11.5, coins.getWeight());
+    }
+
+    @Test
+    @DisplayName("test getWeight() method when one coin is heavier than others")
+    void testGetWeightHeavier() {
+        coins.set(0, new Coin(1.5));
+        assertEquals(12.5, coins.getWeight());
+    }
+
+    @Test
     @DisplayName("test when first coin is fake and it lighter than other coin")
     void testFakeFirstLighter() {
         Coin fakeCoin = new Coin(0.5);
@@ -210,7 +247,7 @@ class CoinsTest {
 
     @Test
     @DisplayName("test when twelfth coin is fake and it heavier than other coin")
-    void testFakeTwelfthHeavier(Coins coins) {
+    void testFakeTwelfthHeavier() {
         Coin fakeCoin = new Coin(1.5);
         coins.set(11, fakeCoin);
         assertEquals(fakeCoin, coins.fake());
