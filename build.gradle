@@ -17,7 +17,7 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'org.junit.platform.gradle.plugin'
 
-mainClassName = "homework1.App"
+mainClassName = ""
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -26,4 +26,11 @@ dependencies {
   // JUnit Jupiter API and TestEngine implementation
   testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
   testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+}
+
+// gradle --console plain runShell
+task runShell(type: JavaExec) {
+  standardInput = System.in
+  classpath sourceSets.main.runtimeClasspath
+  main = "homework3.ShellApp"
 }
