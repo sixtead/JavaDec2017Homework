@@ -11,8 +11,6 @@ repositories {
   mavenCentral()
 }
 
-ext.junitJupiterVersion = '5.0.3'
-
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'org.junit.platform.gradle.plugin'
@@ -24,9 +22,10 @@ targetCompatibility = 1.8
 
 dependencies {
   // JUnit Jupiter API and TestEngine implementation
-  testCompile("org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}")
-  testRuntime("org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}")
+  testCompile("org.junit.jupiter:junit-jupiter-api:5.0.3")
+  testRuntime("org.junit.jupiter:junit-jupiter-engine:5.0.3")
   compile("org.apache.tika:tika-parsers:1.17")
+  compile("com.h2database:h2:1.4.196")
 }
 
 // gradle --console plain runShell
@@ -40,4 +39,9 @@ task parseMp3(type: JavaExec) {
   standardInput = System.in
   classpath sourceSets.main.runtimeClasspath
   main = "homework3.Mp3Parser"
+}
+
+task runLibrary(type: JavaExec) {
+  classpath sourceSets.main.runtimeClasspath
+  main = "homework4.Library"
 }
