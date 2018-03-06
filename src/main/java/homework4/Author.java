@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Author {
-    private static Connection conn = null;
     private Integer id;
     private String name;
 
@@ -15,7 +14,7 @@ public class Author {
 		return DriverManager.getConnection("jdbc:h2:mem:", "sa", "");
 	};
 
-    Author(Integer id, String name) throws SQLException {
+    private Author(Integer id, String name) throws SQLException {
         this.id = id;
         this.name = name;
     }
@@ -49,7 +48,7 @@ public class Author {
     }
     
     public static Author getByName(String name) throws SQLException {
-        conn = connect();
+        Connection conn = DBConnector.getConnection();
         Integer id;
         PreparedStatement pStatement = conn.prepareStatement(
             "SELECT `id`\n" +
@@ -58,7 +57,6 @@ public class Author {
         );
         pStatement.setString(1, name);
         ResultSet rSet = pStatement.executeQuery();
-        conn.close();
 
         id = rSet.first() ? rSet.getInt(1) : null;
         return (id != null) ? new Author(id, name) : null;

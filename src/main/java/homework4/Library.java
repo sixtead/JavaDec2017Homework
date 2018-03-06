@@ -8,19 +8,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Library {
-    private Connection conn;
 
-    Library() throws SQLException{
-        // try {
-		// 	Class.forName("org.h2.Driver");
-		// } catch (ClassNotFoundException e) {
-		// 	e.printStackTrace();
-		// }
-		this.conn = DriverManager.getConnection("jdbc:h2:mem:", "sa", "");
-    }
+    Library() {}
 
     public void init() throws SQLException {
+        Connection conn = DBConnector.getConnection();
         Statement query = conn.createStatement();
+
         query.executeUpdate(
             "CREATE TABLE `books` (" +
             "   `id` INT NOT NULL AUTO_INCREMENT," +
@@ -54,9 +48,11 @@ public class Library {
             "   ADD CONSTRAINT `books_fk1`" +
             "       FOREIGN KEY (`title_id`) REFERENCES `titles`(`id`);"
         );
+
     }
 
     public int addAuthor(String name) throws SQLException {
+        Connection conn = DBConnector.getConnection();
         PreparedStatement query = conn.prepareStatement(
             "INSERT INTO `authors` (`name`)\n" +
             "VALUES (?);",
@@ -67,10 +63,12 @@ public class Library {
 
         ResultSet tableKeys = query.getGeneratedKeys();
         tableKeys.next();
+
         return tableKeys.getInt(1);
     }
 
     public int getAuthor(String name) throws SQLException {
+        Connection conn = DBConnector.getConnection();
         PreparedStatement query = conn.prepareStatement(
             "SELECT `id`\n" +
             "FROM `authors`\n" +
@@ -78,6 +76,7 @@ public class Library {
         );
         query.setString(1, name);
         ResultSet result = query.executeQuery();
+
         return result.first() ? result.getInt(1) : -1;
     }
 

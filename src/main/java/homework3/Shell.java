@@ -16,9 +16,10 @@ public class Shell {
         // sc.close();
     }
 
-    void parse(String args) {
+    void parse(String command) {
+        String[] args = command.split(" ");
         
-        switch(args.split(" ")[0]) {
+        switch(args[0]) {
             case "help":
                 Commands.help();
                 break;
@@ -26,7 +27,10 @@ public class Shell {
                 Commands.pwd(Paths.get(""));
                 break;
             case "ls":
-                Commands.ls(Paths.get(""));
+                CommandsParser.parseLs(args);
+                break;
+            case "cp":
+                CommandsParser.parseCp(args);
                 break;
             case "quit":
                 Commands.quit();

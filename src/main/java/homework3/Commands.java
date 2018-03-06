@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 class Commands {
     static void help() {
@@ -27,4 +28,5 @@ class Commands {
     static void quit() {
         System.exit(0);
     }
+
 }
