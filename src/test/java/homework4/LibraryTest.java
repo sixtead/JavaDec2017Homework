@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 public class LibraryTest {
     @Test
     @DisplayName("test library constructor")
-    void testConstructor() throws SQLException {
+    void testConstructor() {
         assertNotNull(new Library());
     }
 }

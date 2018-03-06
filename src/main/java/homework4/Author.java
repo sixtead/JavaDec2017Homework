@@ -1,64 +1,130 @@
 package homework4;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class Author {
     private Integer id;
     private String name;
 
-    private static Connection connect() throws SQLException {
-		return DriverManager.getConnection("jdbc:h2:mem:", "sa", "");
-	};
+    Author(String name) {
+        this.id = null;
+        this.name = name;
+    }
 
-    private Author(Integer id, String name) throws SQLException {
+    private Author(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
 
-	/**
-	 * @return the id
-	 */
 	public Integer getId() {
 		return id;
 	}
 
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(Integer id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the name
-	 */
 	public String getName() {
 		return name;
 	}
 
-	/**
-	 * @param name the name to set
-	 */
-	public void setName(String name) {
-		this.name = name;
+	public static Author getById(int id) throws SQLException {
+        ResultSet rSet = Author.select(id);
+        if(rSet.first()) {
+            return new Author(rSet.getInt(1), rSet.getString(2));
+        } else {
+            return null;
+        }
     }
-    
+
     public static Author getByName(String name) throws SQLException {
+        ResultSet rSet = Author.select(name);
+        if(rSet.first()) {
+            return new Author(rSet.getInt(1), rSet.getString(2));
+        } else {
+            return null;
+        }
+    }
+
+    private static ResultSet select(int id) throws SQLException {
         Connection conn = DBConnector.getConnection();
-        Integer id;
         PreparedStatement pStatement = conn.prepareStatement(
-            "SELECT `id`\n" +
-            "FROM `authors`\n" +
-            "WHERE `name` = ?;"
+                "SELECT `id`, `name`\n" +
+                "FROM `authors`\n" +
+                "WHERE `id` = ?;"
+        );
+        pStatement.setInt(1, id);
+        return pStatement.executeQuery();
+    }
+
+    private static ResultSet select(String name) throws SQLException {
+        Connection conn = DBConnector.getConnection();
+        PreparedStatement pStatement = conn.prepareStatement(
+                "SELECT `id`, `name`\n" +
+                        "FROM `authors`\n" +
+                        "WHERE `name` = ?;"
         );
         pStatement.setString(1, name);
-        ResultSet rSet = pStatement.executeQuery();
+        return pStatement.executeQuery();
+    }
 
-        id = rSet.first() ? rSet.getInt(1) : null;
-        return (id != null) ? new Author(id, name) : null;
+    public void save() throws SQLException {
+        Author auth = Author.getByName(name);
+
+        id = (auth != null) ? auth.getId() : Author.insert(name).getId();
+    }
+
+    private static Author insert(String name) throws SQLException {
+        Connection conn = DBConnector.getConnection();
+        PreparedStatement pStatement = conn.prepareStatement(
+                "INSERT INTO `authors` (`name`)\n" +
+                "VALUES (?);",
+                Statement.RETURN_GENERATED_KEYS
+        );
+        pStatement.setString(1, name);
+        pStatement.executeUpdate();
+
+        ResultSet tableKeys = pStatement.getGeneratedKeys();
+        tableKeys.next();
+
+        return new Author(tableKeys.getInt(1), name);
+    }
+
+    public void rename(String name) throws SQLException {
+        if(id != null) {
+            this.name = update(name).getName();
+        } else {
+            System.out.println("No such entry in database");
+        }
+    }
+
+    private Author update(String name) throws SQLException {
+        Connection conn = DBConnector.getConnection();
+        PreparedStatement pStatement = conn.prepareStatement(
+                "UPDATE `authors`\n" +
+                "SET `name` = ?\n" +
+                "WHERE `id` = ?;"
+        );
+        pStatement.setString(1, name);
+        pStatement.setInt(2, id);
+        pStatement.executeUpdate();
+
+        return new Author(id, name);
+    }
+
+    public void remove() {
+//        check if author not used in any books
+//        if so, print message with id's of these books
+//        otherwise call private method delete
+    }
+
+    private void delete() throws SQLException {
+        Connection conn = DBConnector.getConnection();
+        PreparedStatement pStatement = conn.prepareStatement(
+                "DELETE FROM `authors`\n" +
+                "WHERE `id` = ?;"
+        );
+        pStatement.setInt(1, id);
+        pStatement.executeUpdate();
     }
 }
