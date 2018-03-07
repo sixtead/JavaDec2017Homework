@@ -18,11 +18,11 @@ class AuthorTest {
         try {
             Statement statement = conn.createStatement();
             statement.executeUpdate(
-                    "CREATE TABLE `authors` (" +
-                            "	`id` INT NOT NULL AUTO_INCREMENT," +
-                            "	`name` varchar(100) NOT NULL UNIQUE," +
-                            "	PRIMARY KEY (`id`)" +
-                            ");"
+                    "CREATE TABLE IF NOT EXISTS `authors` (" +
+                    "	`id` INT NOT NULL AUTO_INCREMENT," +
+                    "	`name` varchar(100) NOT NULL UNIQUE," +
+                    "	PRIMARY KEY (`id`)" +
+                    ");"
             );
         } catch (SQLException e) {
             e.printStackTrace();

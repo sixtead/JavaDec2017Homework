@@ -10,6 +10,8 @@ public class Author {
     private Integer id;
     private String name;
 
+    private static final String TABLE = "`authors`";
+
     Author(String name) {
         this.id = null;
         this.name = name;
@@ -47,30 +49,35 @@ public class Author {
     }
 
     private static ResultSet select(int id) throws SQLException {
-        Connection conn = DBConnector.getConnection();
-        PreparedStatement pStatement = conn.prepareStatement(
-                "SELECT `id`, `name`\n" +
-                "FROM `authors`\n" +
-                "WHERE `id` = ?;"
-        );
-        pStatement.setInt(1, id);
-        return pStatement.executeQuery();
+        // Connection conn = DBConnector.getConnection();
+        // PreparedStatement pStatement = conn.prepareStatement(
+        //         "SELECT `id`, `name`\n" +
+        //         "FROM `authors`\n" +
+        //         "WHERE `id` = ?;"
+        // );
+        // pStatement.setInt(1, id);
+        // return pStatement.executeQuery();
+        String cols = "`id`, `name`";
+        String conds = "`id` = " + id;
+        return new DBQuery().select(TABLE, cols, conds);
     }
 
     private static ResultSet select(String name) throws SQLException {
-        Connection conn = DBConnector.getConnection();
-        PreparedStatement pStatement = conn.prepareStatement(
-                "SELECT `id`, `name`\n" +
-                        "FROM `authors`\n" +
-                        "WHERE `name` = ?;"
-        );
-        pStatement.setString(1, name);
-        return pStatement.executeQuery();
+        // Connection conn = DBConnector.getConnection();
+        // PreparedStatement pStatement = conn.prepareStatement(
+        //         "SELECT `id`, `name`\n" +
+        //                 "FROM `authors`\n" +
+        //                 "WHERE `name` = ?;"
+        // );
+        // pStatement.setString(1, name);
+        // return pStatement.executeQuery();
+        String cols = "`id`, `name`";
+        String conds = "`name` LIKE '" + name + "'";
+        return new DBQuery().select(TABLE, cols, conds);
     }
 
     public void save() throws SQLException {
         Author auth = Author.getByName(name);
-
         id = (auth != null) ? auth.getId() : Author.insert(name).getId();
     }
 
