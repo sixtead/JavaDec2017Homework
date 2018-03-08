@@ -55,7 +55,7 @@ public class Mp3FileWalker  extends SimpleFileVisitor<Path> {
             String type = tika.detect(p);
             return type.equals("audio/mpeg");
 		} catch (IOException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
             return false;
 		}
     }
@@ -81,7 +81,7 @@ public class Mp3FileWalker  extends SimpleFileVisitor<Path> {
 
             Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException | SAXException | TikaException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -92,7 +92,7 @@ public class Mp3FileWalker  extends SimpleFileVisitor<Path> {
             try {
 				Files.createDirectories(dirPath);
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println(e.getMessage());
 			}
         }
     }

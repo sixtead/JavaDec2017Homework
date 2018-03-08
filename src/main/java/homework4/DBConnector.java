@@ -5,6 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 class DBConnector {
+
     private static Connection conn = null;
 
     static Connection getConnection()
@@ -16,10 +17,10 @@ class DBConnector {
 
     private static Connection getConnection(String db) {
         try {
-            // conn = DriverManager.getConnection("jdbc:h2:./data/"+ db, "sa", "");
-            conn = DriverManager.getConnection("jdbc:h2:mem:"+ db + ";DB_CLOSE_DELAY=-1", "sa", "");
+             conn = DriverManager.getConnection("jdbc:h2:./data/"+ db, "sa", "");
+//            conn = DriverManager.getConnection("jdbc:h2:mem:"+ db + ";DB_CLOSE_DELAY=-1", "sa", "");
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
 
         return conn;

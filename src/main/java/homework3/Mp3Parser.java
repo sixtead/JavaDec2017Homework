@@ -17,7 +17,7 @@ class Mp3Parser {
         try {
 			Files.walkFileTree(homePath, walker);
 		} catch (IOException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
     }
 }

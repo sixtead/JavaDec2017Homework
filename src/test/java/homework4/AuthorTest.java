@@ -1,12 +1,9 @@
 package homework4;
 
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -14,19 +11,13 @@ class AuthorTest {
 
     @BeforeAll
     static void setUp() {
-        Connection conn = DBConnector.getConnection();
-        try {
-            Statement statement = conn.createStatement();
-            statement.executeUpdate(
-                    "CREATE TABLE IF NOT EXISTS `authors` (" +
-                    "	`id` INT NOT NULL AUTO_INCREMENT," +
-                    "	`name` varchar(100) NOT NULL UNIQUE," +
-                    "	PRIMARY KEY (`id`)" +
-                    ");"
-            );
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Author.drop();
+        Author.migrate();
+    }
+
+    @AfterAll
+    static void tearDown() {
+        Author.drop();
     }
 
     @Test
@@ -43,40 +34,33 @@ class AuthorTest {
     void testSave() {
         Author author = new Author("Dave Thomas");
         assertNull(author.getId());
-
-        try {
-            author.save();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
+        author.save();
         assertNotNull(author.getId());
+    }
+
+    @Test
+    @DisplayName("test getById static method")
+    void testGetById() {
+        Author author = Author.getById(1);
+        assertEquals(1, (int) author.getId());
     }
 
     @Test
     @DisplayName("test getByName static method")
     void testGetByName() {
         Author author = new Author("John Savage");
-        try {
-            author.save();
-            Author authorFromDB = Author.getByName("John Savage");
-            assertNotNull(authorFromDB);
-            assertEquals(author.getId(), authorFromDB.getId());
-            assertEquals(author.getName(), authorFromDB.getName());
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        author.save();
+        Author authorFromDB = Author.getByName("John Savage");
+        assertNotNull(authorFromDB);
+        assertEquals(author.getId(), authorFromDB.getId());
+        assertEquals(author.getName(), authorFromDB.getName());
     }
 
     @Test
     @DisplayName("test getByName with non-existing author")
     void testGetByNameNonExistingAuthor() {
-        try {
-            Author author = Author.getByName("Philip K. Dick");
-            assertNull(author);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        Author author = Author.getByName("Philip K. Dick");
+        assertNull(author);
     }
 
     @Test
@@ -85,18 +69,27 @@ class AuthorTest {
         String oldName = "Ray Bradbury";
         String newName = "George Orwell";
         Author author = new Author(oldName);
-        try {
-            author.save();
-            assertNotNull(author.getId());
-            int id = author.getId();
-            assertEquals(oldName, author.getName());
-            author.rename(newName);
-            assertEquals(id, (int)author.getId());
-            assertNotEquals(oldName, author.getName());
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        author.save();
+//        System.out.println("ID = " + author.getId());
+//        System.out.println("NAME = " + author.getName());
+        assertNotNull(author.getId());
+        int id = author.getId();
+        assertEquals(oldName, author.getName());
+        author.rename(newName);
+        assertEquals(id, (int) author.getId());
+        assertNotEquals(oldName, author.getName());
     }
 
+    @Test
+    @DisplayName("test remove method")
+    void testRemove() {
+        Author author = Author.getById(1);
+        assertNotNull(author);
+        author.remove();
+        assertNull(author.getId());
+        assertNull(author.getName());
+//        System.out.println("SHOULD FAIL ALREADY");
+        author = Author.getById(1);
+        assertNull(author);
+    }
 }

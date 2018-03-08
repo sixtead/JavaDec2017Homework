@@ -1,47 +1,109 @@
 package homework4;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
+import java.util.Map;
 
 class DBQuery {
 
-    int insert(String table, String columns, String values) throws SQLException {
+    static int insert(String table, String columns, String values, Map<Integer, Object> parameters) throws SQLException {
         Connection conn = DBConnector.getConnection();
-        Statement statement = conn.createStatement();
-        StringBuilder sql = new StringBuilder();
-        sql.append("INSERT INTO ").append(table).append(" (").append(columns).append(") ");
-        sql.append("VALUES ").append("(").append(values).append(")").append(";");
-        return statement.executeUpdate(sql.toString());
+        String sql = "INSERT INTO " + table + " (" + columns + ") " +
+                     "VALUES " + "(" + values + ")" + ";";
+        PreparedStatement pStatement = conn.prepareStatement(sql);
+
+        for(Map.Entry<Integer, Object> param : parameters.entrySet()) {
+            Integer key = param.getKey();
+            Object value = param.getValue();
+            if (value instanceof Integer) {
+                pStatement.setInt(key, (int) value);
+            } else if (value instanceof String) {
+                pStatement.setString(key, (String) value);
+            }
+        }
+//        conn.close();
+        return pStatement.executeUpdate();
     }
 
-    ResultSet select(String table, String columns, String conditions) throws SQLException {
+    static ResultSet select(String table, String columns, String conditions, Map<Integer, Object> parameters) throws SQLException {
         Connection conn = DBConnector.getConnection();
-        Statement statement = conn.createStatement();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT ").append(columns).append(" ");
-        sql.append("FROM ").append(table).append(" ");
-        sql.append("WHERE ").append(conditions).append(";");
-        return statement.executeQuery(sql.toString());
+        String sql = "SELECT " + columns + " " +
+                     "FROM " + table + " " +
+                     "WHERE " + conditions + ";";
+        PreparedStatement pStatement = conn.prepareStatement(sql);
+
+        for(Map.Entry<Integer, Object> param : parameters.entrySet()) {
+            Integer key = param.getKey();
+            Object value = param.getValue();
+            if (value instanceof Integer) {
+                pStatement.setInt(key, (int) value);
+            } else if (value instanceof String) {
+                pStatement.setString(key, (String) value);
+            }
+        }
+        return pStatement.executeQuery();
     }
 
-    int update(String table, String columnsValues, String conditions) throws SQLException {
+    static int update(String table, String columnsValues, String conditions, Map<Integer, Object> parameters) throws SQLException {
         Connection conn = DBConnector.getConnection();
-        Statement statement = conn.createStatement();
-        StringBuilder sql = new StringBuilder();
-        sql.append("UPDATE ").append(table).append(" ");
-        sql.append("SET" ).append(columnsValues).append(" ");
-        sql.append("WHERE ").append(conditions).append(";");
-        return statement.executeUpdate(sql.toString());
+        String sql = "UPDATE " + table + " " +
+                     "SET " + columnsValues + " " +
+                     "WHERE " + conditions + ";";
+        PreparedStatement pStatement = conn.prepareStatement(sql);
+
+        for(Map.Entry<Integer, Object> param : parameters.entrySet()) {
+            Integer key = param.getKey();
+            Object value = param.getValue();
+            if (value instanceof Integer) {
+                pStatement.setInt(key, (int) value);
+            } else if (value instanceof String) {
+                pStatement.setString(key, (String) value);
+            }
+        }
+        return pStatement.executeUpdate();
     }
 
-    int delete(String table, String conditions) throws SQLException {
+    static int delete(String table, String conditions, Map<Integer, Object> parameters) throws SQLException {
         Connection conn = DBConnector.getConnection();
-        Statement statement = conn.createStatement();
-        StringBuilder sql = new StringBuilder();
-        sql.append("DELETE FROM ").append(table).append(" ");
-        sql.append("WHERE ").append(conditions).append(";");
-        return statement.executeUpdate(sql.toString());
+        String sql = "DELETE FROM " + table + " " +
+                     "WHERE " + conditions + ";";
+        PreparedStatement pStatement = conn.prepareStatement(sql);
+
+        for(Map.Entry<Integer, Object> param : parameters.entrySet()) {
+            Integer key = param.getKey();
+            Object value = param.getValue();
+            if (value instanceof Integer) {
+                pStatement.setInt(key, (int) value);
+            } else if (value instanceof String) {
+                pStatement.setString(key, (String) value);
+            }
+        }
+        return pStatement.executeUpdate();
+    }
+
+    static void create(String table, String columns) {
+        Connection conn = DBConnector.getConnection();
+        try {
+            Statement statement = conn.createStatement();
+            statement.executeUpdate(
+                    "CREATE TABLE IF NOT EXISTS " + table + "(" +
+                    "`id` INT NOT NULL AUTO_INCREMENT," +
+                    columns +
+                    ",PRIMARY KEY (`id`));"
+            );
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    static void drop(String table) {
+        Connection conn = DBConnector.getConnection();
+        try {
+            Statement statement = conn.createStatement();
+            statement.executeUpdate(
+                    "DROP TABLE IF EXISTS" + table + ";"
+            );
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }

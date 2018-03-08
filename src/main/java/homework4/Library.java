@@ -90,7 +90,7 @@ public class Library {
             System.out.println(lib.getAuthor("McGregor"));
             System.out.println(Author.getByName("Ewan"));
 		} catch (SQLException e) {
-			e.printStackTrace();
+			System.out.println(e.getMessage());
         }
     }
 }
