@@ -1,12 +1,21 @@
 package homework4;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Map;
+
+import javax.sql.rowset.CachedRowSet;
+import javax.sql.rowset.RowSetProvider;
+import org.h2.jdbcx.JdbcConnectionPool;
 
 class DBQuery {
 
     static int insert(String table, String columns, String values, Map<Integer, Object> parameters) throws SQLException {
-        Connection conn = DBConnector.getConnection();
+        JdbcConnectionPool cp = DBConnector.getConnectionPool();
+        Connection conn = cp.getConnection();
         String sql = "INSERT INTO " + table + " (" + columns + ") " +
                      "VALUES " + "(" + values + ")" + ";";
         PreparedStatement pStatement = conn.prepareStatement(sql);
@@ -20,12 +29,16 @@ class DBQuery {
                 pStatement.setString(key, (String) value);
             }
         }
-//        conn.close();
-        return pStatement.executeUpdate();
+        int rowsCount = pStatement.executeUpdate();
+        pStatement.close();
+        conn.close();
+        cp.dispose();
+        return rowsCount;
     }
 
     static ResultSet select(String table, String columns, String conditions, Map<Integer, Object> parameters) throws SQLException {
-        Connection conn = DBConnector.getConnection();
+        JdbcConnectionPool cp = DBConnector.getConnectionPool();
+        Connection conn = cp.getConnection();
         String sql = "SELECT " + columns + " " +
                      "FROM " + table + " " +
                      "WHERE " + conditions + ";";
@@ -40,11 +53,17 @@ class DBQuery {
                 pStatement.setString(key, (String) value);
             }
         }
-        return pStatement.executeQuery();
+        ResultSet resultSet = pStatement.executeQuery();
+        CachedRowSet crs = RowSetProvider.newFactory().createCachedRowSet();
+        crs.populate(resultSet);
+        conn.close();
+        cp.dispose();
+        return crs;
     }
 
     static int update(String table, String columnsValues, String conditions, Map<Integer, Object> parameters) throws SQLException {
-        Connection conn = DBConnector.getConnection();
+        JdbcConnectionPool cp = DBConnector.getConnectionPool();
+        Connection conn = cp.getConnection();
         String sql = "UPDATE " + table + " " +
                      "SET " + columnsValues + " " +
                      "WHERE " + conditions + ";";
@@ -59,11 +78,15 @@ class DBQuery {
                 pStatement.setString(key, (String) value);
             }
         }
-        return pStatement.executeUpdate();
+        int rowsCount = pStatement.executeUpdate();
+        conn.close();
+        cp.dispose();
+        return rowsCount;
     }
 
     static int delete(String table, String conditions, Map<Integer, Object> parameters) throws SQLException {
-        Connection conn = DBConnector.getConnection();
+        JdbcConnectionPool cp = DBConnector.getConnectionPool();
+        Connection conn = cp.getConnection();
         String sql = "DELETE FROM " + table + " " +
                      "WHERE " + conditions + ";";
         PreparedStatement pStatement = conn.prepareStatement(sql);
@@ -77,12 +100,16 @@ class DBQuery {
                 pStatement.setString(key, (String) value);
             }
         }
-        return pStatement.executeUpdate();
+        int rowsCount = pStatement.executeUpdate();
+        conn.close();
+        cp.dispose();
+        return rowsCount;
     }
 
     static void create(String table, String columns) {
-        Connection conn = DBConnector.getConnection();
         try {
+            JdbcConnectionPool cp = DBConnector.getConnectionPool();
+            Connection conn = cp.getConnection();
             Statement statement = conn.createStatement();
             statement.executeUpdate(
                     "CREATE TABLE IF NOT EXISTS " + table + "(" +
@@ -90,18 +117,23 @@ class DBQuery {
                     columns +
                     ",PRIMARY KEY (`id`));"
             );
+            conn.close();
+            cp.dispose();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
     }
 
     static void drop(String table) {
-        Connection conn = DBConnector.getConnection();
         try {
+            JdbcConnectionPool cp = DBConnector.getConnectionPool();
+            Connection conn = cp.getConnection();
             Statement statement = conn.createStatement();
             statement.executeUpdate(
                     "DROP TABLE IF EXISTS" + table + ";"
             );
+            conn.close();
+            cp.dispose();
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
