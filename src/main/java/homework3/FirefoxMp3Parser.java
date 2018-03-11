@@ -5,10 +5,10 @@ import java.io.InputStream;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.attribute.BasicFileAttributes;
+
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.metadata.Metadata;
@@ -20,23 +20,23 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 
-public class Mp3FileWalker  extends SimpleFileVisitor<Path> {
-    String DestinationDir;
+public class FirefoxMp3Parser extends SimpleFileVisitor<Path> {
+    Path DestinationDir;
 
-    Mp3FileWalker(String destinationDir) {
+    FirefoxMp3Parser(Path destinationDir) {
         this.DestinationDir = destinationDir;
     }
 
     @Override
     public FileVisitResult preVisitDirectory(Path dir,
             BasicFileAttributes attrs) {
-        System.out.println("Entering " + dir.toString());
         return FileVisitResult.CONTINUE;
     }
 
     @Override
     public FileVisitResult visitFile(Path file,
             BasicFileAttributes attrs) {
+        // for firefox
         if(isMp3(file)) saveAndRename(file);
         return FileVisitResult.CONTINUE;
     }
@@ -76,21 +76,20 @@ public class Mp3FileWalker  extends SimpleFileVisitor<Path> {
 
             destination = (artist != null && artist.equals("")
                     && title != null && !title.equals("") )
-                ? Paths.get(DestinationDir, artist + " - " + title + ".mp3")
-                : Paths.get(DestinationDir, source.getFileName() + ".mp3");
+                ? DestinationDir.resolve(artist + " - " + title + ".mp3")
+                : DestinationDir.resolve(source.getFileName() + ".mp3");
 
             Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
+
         } catch (IOException | SAXException | TikaException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    void mkdir(String dir) {
-        Path dirPath = Paths.get(dir);
-
-        if(!Files.exists(dirPath) || !Files.isDirectory(dirPath)) {
+    void mkdir(Path dir) {
+        if(!Files.exists(dir) || !Files.isDirectory(dir)) {
             try {
-				Files.createDirectories(dirPath);
+				Files.createDirectories(dir);
 			} catch (IOException e) {
 				System.out.println(e.getMessage());
 			}

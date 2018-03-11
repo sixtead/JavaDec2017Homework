@@ -35,8 +35,14 @@ task runShell(type: JavaExec) {
   main = "homework3.ShellApp"
 }
 
+// gradle parseMp3 -Ppath="c:\mp3"
+// grade paeseMp3 -Dpath="c:\mp3"
 task parseMp3(type: JavaExec) {
-  standardInput = System.in
+  // systemProperty "path", System.getProperty("path")
+  args System.getProperty("path", "").split()
+  // if(project.hasProperty('path')) {
+  //       args(path.split(''))
+  //   }
   classpath sourceSets.main.runtimeClasspath
   main = "homework3.Mp3Parser"
 }
