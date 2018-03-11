@@ -29,17 +29,27 @@ public class Shell {
             case "mkdir":
                 CommandsParser.parseMkdir(args);
                 break;
+            case "mv":
+                CommandsParser.parseMv(args);
+                break;
+            case "rm":
+                CommandsParser.parseRm(args);
+                break;
             case "pwd":
-            Commands.pwd(Paths.get(""));
-            break;
+                Commands.pwd(Paths.get(""));
+                break;
             case "ls":
             CommandsParser.parseLs(args);
-            break;
-            case "help":
+                break;
+                case "help":
                 CommandsParser.help(args);
                 break;
             case "quit":
                 Commands.quit();
+                break;
+            default:
+                System.out.println("Unrecognized command");
+                CommandsParser.help(args);
                 break;
         }
     }

@@ -12,7 +12,7 @@ class Commands {
     static void cpFile(Path source, Path destination) {
         try {
             if (Files.exists(destination) && Files.isRegularFile(destination)) {
-                if (confirm("File " + destination + "already exists. Overwrite?")) {
+                if (confirm("File " + destination + " already exists. Overwrite?")) {
                     Files.copy(source, destination, StandardCopyOption.REPLACE_EXISTING);
                 }
             } else {
@@ -31,7 +31,7 @@ class Commands {
 
     static void cpDirectory(Path source, Path destination) {
         if(Files.exists(destination) && Files.isDirectory(destination)) {
-            if(confirm("Directory " + destination + "already exists. Copy anyway?")) {
+            if(confirm("Directory " + destination + " already exists. Copy anyway?")) {
                 cpRecursively(source, destination);
             }
         } else {
@@ -53,7 +53,7 @@ class Commands {
                 }
             }
         } catch (IOException e) {
-            System.out.println("IOException has occurred: " + e.getClass() + ": " + e.getMessage());
+            error(e);
         }
     }
 
@@ -61,7 +61,43 @@ class Commands {
         try {
             Files.createDirectories(destination);
         } catch (IOException e) {
-            System.out.println("IOException has occured: " + e.getClass() + ": " + e.getMessage());
+            error(e);
+        }
+    }
+
+    static void mvFile(Path source, Path destination) {
+        cpFile(source, destination);
+        rmFile(source);
+    }
+
+    static void mvDirectory(Path source, Path destination) {
+        cpDirectory(source, destination);
+        rmDirectory(source);
+    }
+
+    static void rmFile(Path destination) {
+        try {
+            Files.delete(destination);
+        } catch (IOException e) {
+            error(e);
+        }
+    }
+
+    static void rmDirectory(Path destination) {
+        try (DirectoryStream<Path> content = Files.newDirectoryStream(destination)) {
+            for(Path path : content) {
+                Path deeperDestination = destination.resolve(path.getFileName());
+                if(Files.isDirectory(path)) {
+                    rmDirectory(deeperDestination);
+                } else if(Files.isRegularFile(path)) {
+                    rmFile(deeperDestination);
+                } else {
+                    System.out.println("This shouldn't happen");
+                }
+            }
+            rmFile(destination);
+        } catch (IOException e) {
+            error(e);
         }
     }
 
@@ -75,7 +111,7 @@ class Commands {
                 System.out.println(path.getFileName());
             }
         } catch (IOException e) {
-            System.out.println("An IOException has occurred");
+            error(e);
         }
     }
 
@@ -96,6 +132,8 @@ class Commands {
         return false;
     }
 
-//    static
+    private static void error(IOException e) {
+        System.out.println("IOException has occurred: " + e.getClass() + ": " + e.getMessage());
+    }
 
 }

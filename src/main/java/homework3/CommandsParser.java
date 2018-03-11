@@ -1,7 +1,5 @@
 package homework3;
 
-//import com.sun.org.apache.xpath.internal.operations.String;
-
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -58,6 +56,43 @@ class CommandsParser {
         }
     }
 
+    static void parseMv(String[] args) {
+        if(args.length == 3) {
+            Path source = Paths.get(args[1]);
+            Path destination = Paths.get(args[2]);
+
+            if(!Files.exists(source)) {
+                System.out.println("Source file or directory does not exist");
+            } else {
+                if(Files.isDirectory(source)) {
+                    Commands.mvDirectory(source, destination);
+                } else {
+                    Commands.mvFile(source, destination);
+                }
+            }
+        } else {
+            syntaxError("mv");
+        }
+    }
+
+    static void parseRm(String[] args) {
+        if(args.length == 2) {
+            Path destination = Paths.get(args[1]);
+
+            if(!Files.exists(destination)) {
+                System.out.println("File or directory does not exist");
+            } else {
+                if(Files.isDirectory(destination)) {
+                    Commands.rmDirectory(destination);
+                } else {
+                    Commands.rmFile(destination);
+                }
+            }
+        } else {
+            syntaxError("rm");
+        }
+    }
+
     private static void syntaxError(String command) {
         System.out.println("Wrong command syntax. type 'help " + command + "' for help.");
     }
@@ -70,7 +105,7 @@ class CommandsParser {
             command = args[1];
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("Use 'help command'. Available commands are: ");
-            System.out.println("cp, mkdir");
+            System.out.println("cp, mkdir, mv, rm");
             return;
         }
 
@@ -82,6 +117,14 @@ class CommandsParser {
             case "mkdir":
                 message = "Command used to create directory\n" +
                         "usage: mkdir destination";
+                break;
+            case "mv":
+                message = "Command used to move file or directory\n" +
+                        "usage: mv source destination";
+                break;
+            case "rm":
+                message = "Command used to remove file or directory\n" +
+                        "usage: rm destination";
                 break;
             default:
                 message = "";
