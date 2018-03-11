@@ -2,17 +2,15 @@ package homework3;
 
 //import com.sun.org.apache.xpath.internal.operations.String;
 
-import java.io.IOException;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
-
 class CommandsParser {
     static void parseLs(String[] args) {
         if(args.length > 2) {
-            System.out.println("Wrong command syntax. Type `help ls` for help.");
+            syntaxError("ls");
         } else if(args.length > 1){
             Path absolutePath = Paths.get(args[1]).toAbsolutePath();
             
@@ -28,39 +26,51 @@ class CommandsParser {
 
     static void parseCp(String[] args) {
         if(args.length == 3) {
-            Path source = Paths.get(args[1]).toAbsolutePath();
-            Path destination = Paths.get(args[2]).toAbsolutePath();
+            Path source = Paths.get(args[1]);
+            Path destination = (args[2].endsWith(File.separator))
+                    ? Paths.get(args[2]).resolve(source.getFileName())
+                    : Paths.get(args[2]);
 
-            if(Files.exists(destination)) {
-                System.out.println("File or directory: " + destination.toString()
-                        + " already exists. Use cp -f source destination");
+            if(!Files.exists(source)) {
+                System.out.println("Source file or directory does not exist");
             } else {
-                try {
-                    Files.copy(source, destination);
-                    System.out.println("Files copied");
-                } catch (IOException e) {
-                    System.out.println(e.getClass().getCanonicalName());
-                    System.out.println(e.getMessage());
+                if(Files.isDirectory(source)) {
+                    Commands.cpDirectory(source, destination);
+                } else {
+                    Commands.cpFile(source, destination);
                 }
             }
-        } else if(args.length == 4) {
-            Path source = Paths.get(args[2]).toAbsolutePath();
-            Path destination = Paths.get(args[3]).toAbsolutePath();
-            String option = args[1];
-
-            switch (option) {
-                case "-f":
-                    try {
-                        Files.copy(source, destination, REPLACE_EXISTING);
-                    } catch (IOException e) {
-                        System.out.println(e.getClass().getCanonicalName());
-                        System.out.println(e.getMessage());
-                    }
-                    break;
-                case "-r":
-
-            }
-
+        } else {
+            syntaxError("cp");
         }
+    }
+
+    private static void syntaxError(String command) {
+        System.out.println("Wrong command syntax. type 'help " + command + "' for help.");
+    }
+
+    static void help(String[] args) {
+        String command;
+        String message;
+
+        try {
+            command = args[1];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            System.out.println("Use 'help command'. Available commands are: ");
+            System.out.println("cp");
+            return;
+        }
+
+        switch (command) {
+            case "cp":
+                message = "Command used to copy files\\directories\n" +
+                        "usage: cp source destination";
+                break;
+            default:
+                message = "";
+                break;
+        }
+
+        System.out.println(message);
     }
 }
