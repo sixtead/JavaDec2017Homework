@@ -26,14 +26,17 @@ public class Shell {
             case "cp":
                 CommandsParser.parseCp(args);
                 break;
-            case "help":
-                CommandsParser.help(args);
+            case "mkdir":
+                CommandsParser.parseMkdir(args);
                 break;
             case "pwd":
-                Commands.pwd(Paths.get(""));
-                break;
+            Commands.pwd(Paths.get(""));
+            break;
             case "ls":
-                CommandsParser.parseLs(args);
+            CommandsParser.parseLs(args);
+            break;
+            case "help":
+                CommandsParser.help(args);
                 break;
             case "quit":
                 Commands.quit();

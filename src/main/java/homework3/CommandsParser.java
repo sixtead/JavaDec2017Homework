@@ -45,6 +45,19 @@ class CommandsParser {
         }
     }
 
+    static void parseMkdir(String[] args) {
+        if(args.length == 2) {
+            Path destination = Paths.get(args[1]);
+            if(Files.exists(destination) && Files.isDirectory(destination)) {
+                System.out.println("Directory already exists");
+            } else {
+                Commands.mkdir(destination);
+            }
+        } else {
+            syntaxError("mkdir");
+        }
+    }
+
     private static void syntaxError(String command) {
         System.out.println("Wrong command syntax. type 'help " + command + "' for help.");
     }
@@ -57,7 +70,7 @@ class CommandsParser {
             command = args[1];
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("Use 'help command'. Available commands are: ");
-            System.out.println("cp");
+            System.out.println("cp, mkdir");
             return;
         }
 
@@ -65,6 +78,10 @@ class CommandsParser {
             case "cp":
                 message = "Command used to copy files\\directories\n" +
                         "usage: cp source destination";
+                break;
+            case "mkdir":
+                message = "Command used to create directory\n" +
+                        "usage: mkdir destination";
                 break;
             default:
                 message = "";

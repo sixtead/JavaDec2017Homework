@@ -26,7 +26,6 @@ class Commands {
             }
         } catch(IOException e) {
             System.out.println("IOException occurred: " + e.getClass() + ": " + e.getMessage());
-//            e.printStackTrace();
         }
     }
 
@@ -55,7 +54,14 @@ class Commands {
             }
         } catch (IOException e) {
             System.out.println("IOException has occurred: " + e.getClass() + ": " + e.getMessage());
-//            e.printStackTrace();
+        }
+    }
+
+    static void mkdir(Path destination) {
+        try {
+            Files.createDirectories(destination);
+        } catch (IOException e) {
+            System.out.println("IOException has occured: " + e.getClass() + ": " + e.getMessage());
         }
     }
 
