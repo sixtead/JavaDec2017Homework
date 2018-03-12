@@ -26,6 +26,9 @@ public class Shell {
             case "cp":
                 CommandsParser.parseCp(args);
                 break;
+            case "ls":
+                CommandsParser.parseLs(args);
+                break;
             case "mkdir":
                 CommandsParser.parseMkdir(args);
                 break;
@@ -35,13 +38,13 @@ public class Shell {
             case "rm":
                 CommandsParser.parseRm(args);
                 break;
+            case "touch":
+                CommandsParser.parseTouch(args);
+                break;
             case "pwd":
                 Commands.pwd(Paths.get(""));
                 break;
-            case "ls":
-            CommandsParser.parseLs(args);
-                break;
-                case "help":
+            case "help":
                 CommandsParser.help(args);
                 break;
             case "quit":

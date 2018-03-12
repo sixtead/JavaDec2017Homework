@@ -5,6 +5,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.attribute.FileTime;
 import java.util.Scanner;
 
 class Commands {
@@ -57,6 +58,16 @@ class Commands {
         }
     }
 
+    static void ls(Path dir) {
+        try (DirectoryStream<Path> content = Files.newDirectoryStream(dir)) {
+            for (Path path : content) {
+                System.out.println(path.getFileName());
+            }
+        } catch (IOException e) {
+            error(e);
+        }
+    }
+
     static void mkdir(Path destination) {
         try {
             Files.createDirectories(destination);
@@ -101,19 +112,24 @@ class Commands {
         }
     }
 
-    static void pwd(Path currentDir) {
-        System.out.println(currentDir.toAbsolutePath().toString());
-    }
-
-    static void ls(Path dir) {
-        try (DirectoryStream<Path> content = Files.newDirectoryStream(dir)) {
-            for (Path path : content) {
-                System.out.println(path.getFileName());
+    static void touch(Path destination) {
+        try {
+            if(Files.exists(destination)) {
+                FileTime now = FileTime.fromMillis(System.currentTimeMillis());
+                Files.setLastModifiedTime(destination, now);
+            } else {
+                Files.createDirectories(destination.getParent());
+                Files.createFile(destination);
             }
         } catch (IOException e) {
             error(e);
         }
     }
+
+    static void pwd(Path currentDir) {
+        System.out.println(currentDir.toAbsolutePath().toString());
+    }
+
 
     static void quit() {
         System.exit(0);
@@ -123,6 +139,7 @@ class Commands {
         Scanner ans = new Scanner(System.in);
         System.out.print(question + "(y/n) ");
         String answer = ans.next();
+        ans.close();
         if(!answer.equals("y") && !answer.equals("n")) {
             confirm(question);
         } else {

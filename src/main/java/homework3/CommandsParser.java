@@ -6,6 +6,28 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 class CommandsParser {
+    
+    static void parseCp(String[] args) {
+        if(args.length == 3) {
+            Path source = Paths.get(args[1]);
+            Path destination = (args[2].endsWith(File.separator))
+            ? Paths.get(args[2]).resolve(source.getFileName())
+            : Paths.get(args[2]);
+            
+            if(!Files.exists(source)) {
+                System.out.println("Source file or directory does not exist");
+            } else {
+                if(Files.isDirectory(source)) {
+                    Commands.cpDirectory(source, destination);
+                } else {
+                    Commands.cpFile(source, destination);
+                }
+            }
+        } else {
+            syntaxError("cp");
+        }
+    }
+    
     static void parseLs(String[] args) {
         if(args.length > 2) {
             syntaxError("ls");
@@ -19,27 +41,6 @@ class CommandsParser {
             }
         } else {
             Commands.ls(Paths.get(""));
-        }
-    }
-
-    static void parseCp(String[] args) {
-        if(args.length == 3) {
-            Path source = Paths.get(args[1]);
-            Path destination = (args[2].endsWith(File.separator))
-                    ? Paths.get(args[2]).resolve(source.getFileName())
-                    : Paths.get(args[2]);
-
-            if(!Files.exists(source)) {
-                System.out.println("Source file or directory does not exist");
-            } else {
-                if(Files.isDirectory(source)) {
-                    Commands.cpDirectory(source, destination);
-                } else {
-                    Commands.cpFile(source, destination);
-                }
-            }
-        } else {
-            syntaxError("cp");
         }
     }
 
@@ -93,6 +94,16 @@ class CommandsParser {
         }
     }
 
+    static void parseTouch(String[] args) {
+        if(args.length == 2) {
+            Path destination = Paths.get(args[1]);
+
+            Commands.touch(destination);
+        } else {
+            syntaxError("touch");
+        }
+    }
+
     private static void syntaxError(String command) {
         System.out.println("Wrong command syntax. type 'help " + command + "' for help.");
     }
@@ -105,7 +116,7 @@ class CommandsParser {
             command = args[1];
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("Use 'help command'. Available commands are: ");
-            System.out.println("cp, mkdir, mv, rm");
+            System.out.println("cp, ls, mkdir, mv, rm, touch");
             return;
         }
 
@@ -114,6 +125,9 @@ class CommandsParser {
                 message = "Command used to copy files\\directories\n" +
                         "usage: cp source destination";
                 break;
+            case "ls":
+                message = "Command used to list directory content\n" +
+                        "usage: ls [path]";
             case "mkdir":
                 message = "Command used to create directory\n" +
                         "usage: mkdir destination";
@@ -126,6 +140,9 @@ class CommandsParser {
                 message = "Command used to remove file or directory\n" +
                         "usage: rm destination";
                 break;
+            case "touch":
+                message = "Command used to create new file or modify last access time of existing file\n" +
+                        "usage: touch file";
             default:
                 message = "";
                 break;
