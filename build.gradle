@@ -35,7 +35,7 @@ task runShell(type: JavaExec) {
   main = "homework3.ShellApp"
 }
 
-// grade paeseMp3 -Dpath="c:\mp3"
+// grade parseMp3 -Dpath="c:\mp3"
 task parseMp3(type: JavaExec) {
   args System.getProperty("path", "").split()
   classpath sourceSets.main.runtimeClasspath
