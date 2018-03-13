@@ -1,12 +1,13 @@
 package homework3;
 
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
+import java.io.*;
+import java.nio.file.*;
 import java.nio.file.attribute.FileTime;
+import java.util.Arrays;
 import java.util.Scanner;
+import java.util.zip.Deflater;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 class Commands {
 
@@ -124,6 +125,81 @@ class Commands {
         } catch (IOException e) {
             error(e);
         }
+    }
+
+    static void zip(Path source, Path destination) {
+        try {
+            if(!Files.exists(destination.getParent())) Files.createDirectories(destination.getParent());
+            FileOutputStream fos = new FileOutputStream(destination.toFile());
+            ZipOutputStream zos = new ZipOutputStream(fos);
+            zos.setLevel(Deflater.DEFAULT_COMPRESSION);
+
+            if(Files.isDirectory(source)) {
+                addDirectoryToZip(source, source.getFileName(), zos);
+            } else {
+                addFileToZip(source, source.getFileName(), zos);
+            }
+
+            zos.close();
+
+        } catch (IOException e) {
+            error(e);
+        }
+    }
+
+    private static void addFileToZip(Path source, Path zipEntry, ZipOutputStream zos) {
+        try {
+            FileInputStream fis = new FileInputStream(source.toString());
+            ZipEntry ze = new ZipEntry(zipEntry.toString());
+            zos.putNextEntry(ze);
+            byte[] buffer = new byte[2048];
+            int length;
+
+            while ((length = fis.read(buffer)) >= 0) {
+                zos.write(buffer, 0, length);
+            }
+
+            zos.closeEntry();
+            fis.close();
+        } catch (IOException e) {
+            error(e);
+        }
+    }
+
+    private static void addDirectoryToZip(Path source, Path baseDir, ZipOutputStream zos) {
+
+        try (DirectoryStream<Path> content = Files.newDirectoryStream(source)) {
+            for(Path path : content) {
+                Path deeperSource = source.resolve(path.getFileName());
+                if (Files.isDirectory(path)) {
+                    addDirectoryToZip(deeperSource, baseDir, zos);
+                } else if (Files.isRegularFile(path)) {
+//                    addFileToZip(deeperSource, fromBaseDirToDeeperSource, zos);
+                    addFileToZip(deeperSource, deeperSource, zos);
+
+                } else {
+                    System.out.println("This shouldn't happen");
+                }
+            }
+
+        } catch (IOException e) {
+            error(e);
+        }
+
+//        try (DirectoryStream<Path> content = Files.newDirectoryStream(source)) {
+//            for(Path path : content) {
+//                Path deeperSource = source.resolve(path.getFileName());
+//                if(Files.isDirectory(path)) {
+//                    zipDirectory(deeperSource, destination);
+//                } else if(Files.isRegularFile(path)) {
+//                    zipFile(deeperSource, destination);
+//                } else {
+//                    System.out.println("This shouldn't happen");
+//                }
+//            }
+//        } catch (IOException e) {
+//            error(e);
+//        }
     }
 
     static void pwd(Path currentDir) {

@@ -44,6 +44,9 @@ public class Shell {
             case "pwd":
                 Commands.pwd(Paths.get(""));
                 break;
+            case "zip":
+                CommandsParser.parseZip(args);
+                break;
             case "help":
                 CommandsParser.help(args);
                 break;

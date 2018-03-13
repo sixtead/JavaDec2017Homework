@@ -104,6 +104,19 @@ class CommandsParser {
         }
     }
 
+    static void parseZip(String[] args) {
+        Path source = Paths.get(args[1]);
+        if(args.length == 2) {
+            Path destination = source.resolveSibling(source.getFileName() + ".zip");
+            Commands.zip(source, destination);
+        } else if(args.length == 3) {
+            Path destination = Paths.get(args[2]);
+            Commands.zip(source, destination);
+        } else {
+            syntaxError("zip");
+        }
+    }
+
     private static void syntaxError(String command) {
         System.out.println("Wrong command syntax. type 'help " + command + "' for help.");
     }
@@ -116,7 +129,7 @@ class CommandsParser {
             command = args[1];
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("Use 'help command'. Available commands are: ");
-            System.out.println("cp, ls, mkdir, mv, rm, touch");
+            System.out.println("cp, ls, mkdir, mv, rm, touch, zip");
             return;
         }
 
@@ -143,6 +156,11 @@ class CommandsParser {
             case "touch":
                 message = "Command used to create new file or modify last access time of existing file\n" +
                         "usage: touch file";
+                break;
+            case "zip":
+                message = "Command used to zip files\\directories\n" +
+                        "usage: zip source [destination]";
+                break;
             default:
                 message = "";
                 break;
