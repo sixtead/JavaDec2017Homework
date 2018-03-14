@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 class Commands {
@@ -145,6 +146,7 @@ class Commands {
         } catch (IOException e) {
             error(e);
         }
+
     }
 
     private static void addFileToZip(Path source, Path zipEntry, ZipOutputStream zos) {
@@ -174,7 +176,6 @@ class Commands {
                 if (Files.isDirectory(path)) {
                     addDirectoryToZip(deeperSource, baseDir, zos);
                 } else if (Files.isRegularFile(path)) {
-//                    addFileToZip(deeperSource, fromBaseDirToDeeperSource, zos);
                     addFileToZip(deeperSource, baseDir.relativize(deeperSource), zos);
 
                 } else {
@@ -186,20 +187,33 @@ class Commands {
             error(e);
         }
 
-//        try (DirectoryStream<Path> content = Files.newDirectoryStream(source)) {
-//            for(Path path : content) {
-//                Path deeperSource = source.resolve(path.getFileName());
-//                if(Files.isDirectory(path)) {
-//                    zipDirectory(deeperSource, destination);
-//                } else if(Files.isRegularFile(path)) {
-//                    zipFile(deeperSource, destination);
-//                } else {
-//                    System.out.println("This shouldn't happen");
-//                }
-//            }
-//        } catch (IOException e) {
-//            error(e);
-//        }
+    }
+
+    static void unzip(Path source, Path destination) {
+        try (
+            FileInputStream fis = new FileInputStream(source.toFile());
+            ZipInputStream zis = new ZipInputStream(fis)
+        ) {
+            ZipEntry ze;
+
+            while((ze = zis.getNextEntry()) != null) {
+                Path filePath = destination.resolve(ze.getName());
+                Path fileParent = filePath.getParent();
+
+                if(!Files.exists(fileParent)) Files.createDirectories(fileParent);
+                
+                try (FileOutputStream fos = new FileOutputStream(filePath.toFile())) {
+                    byte[] buffer = new byte[2048];
+                    int length;
+    
+                    while ((length = zis.read(buffer)) >= 0) {
+                        fos.write(buffer, 0, length);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            error(e);
+        }
     }
 
     static void pwd(Path currentDir) {

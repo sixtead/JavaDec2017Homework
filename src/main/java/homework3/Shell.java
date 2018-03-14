@@ -47,6 +47,9 @@ public class Shell {
             case "zip":
                 CommandsParser.parseZip(args);
                 break;
+            case "unzip":
+                CommandsParser.parseUnzip(args);
+                break;
             case "help":
                 CommandsParser.help(args);
                 break;

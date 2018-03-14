@@ -105,15 +105,38 @@ class CommandsParser {
     }
 
     static void parseZip(String[] args) {
-        Path source = Paths.get(args[1]);
-        if(args.length == 2) {
-            Path destination = source.resolveSibling(source.getFileName() + ".zip");
-            Commands.zip(source, destination);
-        } else if(args.length == 3) {
-            Path destination = Paths.get(args[2]);
-            Commands.zip(source, destination);
+        if(args.length == 2 || args .length == 3) {
+            Path source = Paths.get(args[1]);
+            
+            if(!Files.exists(source)) {
+                System.out.println("File or directory does not exist");
+            } else {
+                Path destination = (args.length == 3)
+                    ? Paths.get(args[2])
+                    : source.resolveSibling(source.getFileName() + ".zip");
+    
+                Commands.zip(source, destination);
+            }
         } else {
             syntaxError("zip");
+        }
+    }
+
+    static void parseUnzip(String[] args) {
+        if(args.length == 2 || args .length == 3) {
+            Path source = Paths.get(args[1]);
+            
+            if(!Files.exists(source)) {
+                System.out.println("File does not exist");
+            } else {
+                Path destination = (args.length == 3)
+                    ? Paths.get(args[2])
+                    : source.resolveSibling(source.getFileName().toString().replace(".zip", ""));
+    
+                Commands.unzip(source, destination);
+            }
+        } else {
+            syntaxError("unzip");
         }
     }
 
@@ -129,7 +152,7 @@ class CommandsParser {
             command = args[1];
         } catch (ArrayIndexOutOfBoundsException e) {
             System.out.println("Use 'help command'. Available commands are: ");
-            System.out.println("cp, ls, mkdir, mv, rm, touch, zip");
+            System.out.println("cp, ls, mkdir, mv, rm, touch, zip, unzip");
             return;
         }
 
@@ -161,6 +184,9 @@ class CommandsParser {
                 message = "Command used to zip files\\directories\n" +
                         "usage: zip source [destination]";
                 break;
+            case "unzip":
+                message = "COmmand used to unzip a zip archive\n" +
+                        "usage: unzip source [destination]";
             default:
                 message = "";
                 break;
