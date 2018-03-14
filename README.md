@@ -30,3 +30,8 @@ Shell can be launched via `gradle --console plain runShell`, type help to get li
 Parses mp3 files from chrome and firefox. Can be launched via `grade parseMp3 -Dpath="c:\mp3"` or `gradle parseMp3`.
 
 No test for these two.
+
+## Hackerrank
+
+Screenshot of hackerrank progress is located in the root of this repository.
+Source code for "Ceacking the coding interview" is located in this repository: https://github.com/sixtead/cracking_the_coding_interview
