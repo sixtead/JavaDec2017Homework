@@ -1,5 +1,6 @@
 package homework4;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -116,6 +117,24 @@ class DBQuery {
                     "`id` INT NOT NULL AUTO_INCREMENT," +
                     columns +
                     ",PRIMARY KEY (`id`));"
+            );
+            conn.close();
+            cp.dispose();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    static void addFK(String table, String fkName, String field, String referenceTable, String referenceField) {
+        try {
+            JdbcConnectionPool cp = DBConnector.getConnectionPool();
+            Connection conn = cp.getConnection();
+            Statement statement = conn.createStatement();
+            statement.executeUpdate(
+                    "ALTER TABLE " + table +
+                    "ADD CONSTRAINT `" + fkName + "`" +
+                    "FOREIGN KEY (`" + field + "`) " +
+                    "REFERENCES `" + referenceTable + "`(`" + referenceField + "`);"
             );
             conn.close();
             cp.dispose();

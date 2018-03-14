@@ -31,9 +31,9 @@ public class Title {
 	}
 
     public void save() {
-        Title auth = Title.getByName(this.name);
-        if(auth != null) {
-            id = auth.getId();
+        Title title = Title.getByName(this.name);
+        if(title != null) {
+            id = title.getId();
         } else {
             try {
                 Title.insert(this.name);
