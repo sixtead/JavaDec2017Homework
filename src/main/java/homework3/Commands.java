@@ -135,7 +135,7 @@ class Commands {
             zos.setLevel(Deflater.DEFAULT_COMPRESSION);
 
             if(Files.isDirectory(source)) {
-                addDirectoryToZip(source, source.getFileName(), zos);
+                addDirectoryToZip(source, source, zos);
             } else {
                 addFileToZip(source, source.getFileName(), zos);
             }
@@ -175,7 +175,7 @@ class Commands {
                     addDirectoryToZip(deeperSource, baseDir, zos);
                 } else if (Files.isRegularFile(path)) {
 //                    addFileToZip(deeperSource, fromBaseDirToDeeperSource, zos);
-                    addFileToZip(deeperSource, deeperSource, zos);
+                    addFileToZip(deeperSource, baseDir.relativize(deeperSource), zos);
 
                 } else {
                     System.out.println("This shouldn't happen");
