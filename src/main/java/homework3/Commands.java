@@ -129,20 +129,18 @@ class Commands {
     }
 
     static void zip(Path source, Path destination) {
-        try {
-            if(!Files.exists(destination.getParent())) Files.createDirectories(destination.getParent());
+        try (
             FileOutputStream fos = new FileOutputStream(destination.toFile());
-            ZipOutputStream zos = new ZipOutputStream(fos);
+            ZipOutputStream zos = new ZipOutputStream(fos)
+        ) {
             zos.setLevel(Deflater.DEFAULT_COMPRESSION);
+            if(!Files.exists(destination.getParent())) Files.createDirectories(destination.getParent());
 
             if(Files.isDirectory(source)) {
                 addDirectoryToZip(source, source, zos);
             } else {
                 addFileToZip(source, source.getFileName(), zos);
             }
-
-            zos.close();
-
         } catch (IOException e) {
             error(e);
         }
@@ -150,10 +148,11 @@ class Commands {
     }
 
     private static void addFileToZip(Path source, Path zipEntry, ZipOutputStream zos) {
-        try {
-            FileInputStream fis = new FileInputStream(source.toString());
+        try (FileInputStream fis = new FileInputStream(source.toString())) {
             ZipEntry ze = new ZipEntry(zipEntry.toString());
+
             zos.putNextEntry(ze);
+
             byte[] buffer = new byte[2048];
             int length;
 
@@ -162,7 +161,6 @@ class Commands {
             }
 
             zos.closeEntry();
-            fis.close();
         } catch (IOException e) {
             error(e);
         }
@@ -201,7 +199,7 @@ class Commands {
                 Path fileParent = filePath.getParent();
 
                 if(!Files.exists(fileParent)) Files.createDirectories(fileParent);
-                
+
                 try (FileOutputStream fos = new FileOutputStream(filePath.toFile())) {
                     byte[] buffer = new byte[2048];
                     int length;
